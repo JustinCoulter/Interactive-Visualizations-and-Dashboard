@@ -1,38 +1,72 @@
 function buildMetadata(sample) {
-  
-
+ 
   const url =`/metadata/${sample}`;
   console.log(url);
-  // // Use `d3.json` to fetch the metadata for a sample
+  const metaMeta = d3.select("#sample-metadata");
   
+
   d3.json(url).then(function(data) {
-    var metaMeta = d3.select("#sample-metadata");
-    console.log(data);
+    // console.log(data);
+
+    metaMeta.html(""); 
+
+    Object.entries(data).forEach(function([key,value]) {    
+      const cell = metaMeta.append("p");
+      cell.text(`${key}: ${value}`);
+    });
+
   });
-    
-    // Use d3 to select the panel with id of `#sample-metadata`
-
-    // Use `.html("") to clear any existing metadata  
-    // d3.select("#selDataset").node().value = "";
-
-
-    // Use `Object.entries` to add each key and value pair to the panel
-    // Hint: Inside the loop, you will need to use d3 to append new
-    // tags for each key-value in the metadata.
 
     // BONUS: Build the Gauge Chart
     // buildGauge(data.WFREQ);
 }
 
 function buildCharts(sample) {
-  // var sample = d3.select("#selDataset").node().value;
-  // console.log(sample);
-  const url =`/samples/${sample}`;
-  console.log(url);
 
-  // @TODO: Use `d3.json` to fetch the sample data for the plots
+  const url =`/samples/${sample}`;
+  // console.log(url);
+  // const piePie = d3.select("#pie");
+
+  
   d3.json(url).then(function(data) {
+
     console.log(data);
+
+    var trace1 = {
+        labels: data.otu_ids.slice(0,10),
+        values: data.sample_values.slice(0,10),
+        type: 'pie'
+    };
+
+    var dataPie = [trace1];
+
+    var layout = {
+      title: "Pie Chart",
+    };
+    
+    Plotly.newPlot("pie", dataPie, layout);
+
+    var trace2 = {
+        type: "scatter",
+        x:data.otu_ids,
+        y:data.sample_values,
+        text:data.otu_labels,
+        mode:'markers',
+        marker: { 
+          size:data.sample_values,
+          color:data.otu_ids
+        }
+        
+    };
+
+    var layout = {
+      title: "Bubble Chart"
+    }
+    var dataBubble = [trace2];
+    
+    Plotly.newPlot("bubble", dataBubble, layout);    
+    
+
   });
     // @TODO: Build a Bubble Chart using the sample data
 
